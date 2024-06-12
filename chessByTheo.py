@@ -8,7 +8,8 @@ layout = [  [sg.Text("Choose your option:")],
             [sg.Button('Quit Game')] ]
 
 # Create the Window
-window = sg.Window('Chess by Theo', layout)
+window = sg.Window('Chess by Theo', layout, size=(250, 150), 
+                   resizable=True)
 
 while True:
     event, values = window.read()

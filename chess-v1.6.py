@@ -111,7 +111,7 @@ def draw_game_GUI(board):
                 [sg.Button('Quit')] ]
 
     # Create the Window
-    window = sg.Window('Chess by Theo', layout)
+    window = sg.Window('Chess by Theo', layout, resizable=True)
 
     # Event Loop to process "events" and get the "values" of the inputs
     while True:
@@ -333,7 +333,8 @@ def launch_GUI_menu(sys):
                 [sg.Button('Settings')], [sg.Button('Quit Game')] ]
     
     # Create the Window
-    window = sg.Window('Chess by Theo', layout)
+    window = sg.Window('Chess by Theo', layout, size=(250, 200), 
+                   resizable=True)
 
     while True:
         event, values = window.read()
