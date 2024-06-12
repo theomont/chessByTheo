@@ -1,0 +1,4 @@
+1. sinc with git
+2. dev UX (pysimpleGUI)
+2. make it OO
+3. dev AI play feature 
