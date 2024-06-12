@@ -23,3 +23,4 @@ while True:
             exec(file.read())
     elif event == sg.WIN_CLOSED or event == 'Quit Game': 
         window.close()
+        break
