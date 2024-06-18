@@ -138,7 +138,6 @@ def validMoviment(start_position, end_position, piece):
         else: return False
 
     elif piece_type == "pawn":
-        print("2 DEBUG piece_color:", piece_color)
         if piece_color == "white":
             if delta_column == 0 and (delta_row == 1 or (delta_row == 2 and start_position_row_index == 1)): return True
             elif abs(delta_column) == 1 and delta_row == 1: return True

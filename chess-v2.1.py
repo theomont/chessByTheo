@@ -16,6 +16,8 @@
 ### - Não parmitir que o jogador mexa a pedra do adversario
 ### - verificar obstrução
 ### - não permitir que peça mate peça aliada
+### - abandonar pysimpleGUI e usar Tkinter
+### - recriar menu
 ###############################
 
 #### REF ####
@@ -71,16 +73,14 @@ color = board_cell_black_color
 name = None
 selected = False
 
-board = pygame.Rect(0,0,board_size,board_size)
-#pygame.draw.rect(screen, board_color, board)
 piece = None #piece color, piece name, piece logo
-
 origin_cell = None
 destiny_cell = None
-moving_piece = piece
+moving_piece = None
 moving_status = False
 
-
+## initializating board ##
+board = pygame.Rect(0,0,board_size,board_size)
 
 for i in range(0,8):
     posX = i*board_cell_size + board_margin_size
@@ -89,24 +89,22 @@ for i in range(0,8):
     for j in range(0,8):
         posY = j*board_cell_size + board_margin_size
         name = lib.getRowName(7-j)+lib.getColumnName(i)
-        print("name:", name)
         piece = lib.setInitialPiece(name)
-        print("piece", piece)
         cell =  [pygame.Rect(posX,posY,board_cell_size,board_cell_size), color, name, selected, piece]
-        #if cell[3]==False: pygame.draw.rect(screen, color, cell[0])
-        #else: pygame.draw.rect(screen, board_cell_sellected_color, cell[0])
         chess.append(cell)
         if color == board_cell_white_color: color = board_cell_black_color
         else:  color = board_cell_white_color
     
+    ## checking set-up ##
     for cell in chess:
-        print(cell[2], cell[4])
+        print(cell[2], cell[4][0], cell[4][1] )
 
 
 while running:
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("white")
 
+    ## drawing board ##
     pygame.draw.rect(screen, board_color, board)
 
     for cell in chess:
@@ -121,7 +119,6 @@ while running:
                 img = pygame.transform.rotozoom(img,0,lib.scale_piece_img_rate)
                 img_rect = img.get_rect(center = rect.center)
                 screen.blit(img, img_rect)
-
         else:  
             pygame.draw.rect(screen, board_cell_sellected_color, rect)
             img = cell[4][2]
@@ -146,15 +143,14 @@ while running:
                                 origin_cell = num
                                 origin_cell_name = chess[num][2]
                                 moving_piece = piece
-                                print("get piece", piece, name)
+                                print("grab", piece[0], piece[1], "from", name)
                             elif moving_status == True: 
-                                print("origin_cell:",origin_cell, "destiny_cell:",chess[num][2], "piece:",moving_piece)
                                 if lib.validMoviment(origin_cell_name, chess[num][2], moving_piece):
                                     print("valid")    
                                     chess[origin_cell][3] = False
                                     chess[origin_cell][4] = lib.empty
                                     chess[num][4] = moving_piece
-                                    print("release piece", moving_piece, name)
+                                    print("place", moving_piece[0], moving_piece[1], "on", name)
                                     moving_status = False
                                     origin_cell = None
                                     moving_piece = None
@@ -164,14 +160,10 @@ while running:
                             moving_status = False
                             origin_cell = None
                             moving_piece = None
-                            print("deselect", piece, name)
-
-
-                        #pygame.draw.rect(screen, board_cell_sellected_color, chess[num][0])
-                        print(cell[2], piece, num, event.pos)
+                            print("release", piece[0], piece[1], "back to", name)
+                            
         if event.type == pygame.QUIT:
             running = False
-
 
     # flip() the display to put your work on screen
     pygame.display.flip()
@@ -179,6 +171,8 @@ while running:
     # limits FPS to 60
     # dt is delta time in seconds since last frame, used for framerate-
     # independent physics.
-    dt = clock.tick(60) / 1000
+    #dt = clock.tick(60) / 1000
 
 pygame.quit()
+
+print("---------------------- end ----------------------\n\n") 
