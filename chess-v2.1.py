@@ -20,7 +20,7 @@
 
 #### REF ####
 # local path E:/dev/chess/chessVenv/Lib/site-packages/pygame/docs/generated/index.html
-# python -m pygame.docs
+# python -m pygame.docsu
 #ref1 https://www.youtube.com/watch?v=Ro82dac_J1Y
 #ref2 https://pygame.readthedocs.io/en/latest/rect/rect.html
 
