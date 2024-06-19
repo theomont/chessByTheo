@@ -1,22 +1,8 @@
 import pygame
+import style.style as sty
 ## constants
 empty = 'none','empty', None
 scale_piece_img_rate = 0.6
-
-## piece images
-white_pawn_logo = pygame.image.load('./style/white_pawn.png')
-white_rook_logo = pygame.image.load('./style/white_rook.png')
-white_knight_logo = pygame.image.load('./style/white_knight.png')
-white_bishop_logo = pygame.image.load('./style/white_bishop.png')
-white_queen_logo = pygame.image.load('./style/white_queen.png')
-white_king_logo = pygame.image.load('./style/white_king.png')
-
-black_pawn_logo = pygame.image.load('./style/black_pawn.png')
-black_rook_logo = pygame.image.load('./style/black_rook.png')
-black_knight_logo = pygame.image.load('./style/black_knight.png')
-black_bishop_logo = pygame.image.load('./style/black_bishop.png')
-black_queen_logo = pygame.image.load('./style/black_queen.png')
-black_king_logo = pygame.image.load('./style/black_king.png')
 
 ## methods and functions
 def getColumnIndex(name):
@@ -83,19 +69,19 @@ def setInitialPiece(name):
     black_queen = ["8d"]
     black_king = ["8e"]
 
-    if name in white_pawn: return 'white', 'pawn', white_pawn_logo
-    elif name in white_rook: return 'white', 'rook', white_rook_logo
-    elif name in white_knight: return 'white', 'knight', white_knight_logo
-    elif name in white_bishop: return 'white', 'bishop', white_bishop_logo
-    elif name in white_queen: return 'white', 'queen', white_queen_logo 
-    elif name in white_king: return 'white', 'king', white_king_logo
+    if name in white_pawn: return 'white', 'pawn', sty.white_pawn_logo
+    elif name in white_rook: return 'white', 'rook', sty.white_rook_logo
+    elif name in white_knight: return 'white', 'knight', sty.white_knight_logo
+    elif name in white_bishop: return 'white', 'bishop', sty.white_bishop_logo
+    elif name in white_queen: return 'white', 'queen', sty.white_queen_logo 
+    elif name in white_king: return 'white', 'king', sty.white_king_logo
 
-    elif name in black_pawn: return 'black', 'pawn', black_pawn_logo
-    elif name in black_rook: return 'black', 'rook', black_rook_logo
-    elif name in black_knight: return 'black', 'knight', black_knight_logo
-    elif name in black_bishop: return 'black', 'bishop', black_bishop_logo
-    elif name in black_queen: return 'black', 'queen', black_queen_logo
-    elif name in black_king: return 'black', 'king', black_king_logo
+    elif name in black_pawn: return 'black', 'pawn', sty.black_pawn_logo
+    elif name in black_rook: return 'black', 'rook', sty.black_rook_logo
+    elif name in black_knight: return 'black', 'knight', sty.black_knight_logo
+    elif name in black_bishop: return 'black', 'bishop', sty.black_bishop_logo
+    elif name in black_queen: return 'black', 'queen', sty.black_queen_logo
+    elif name in black_king: return 'black', 'king', sty.black_king_logo
     else: return empty
 
 ## versão pré-pygame (requer update)
@@ -147,3 +133,31 @@ def validMoviment(start_position, end_position, piece):
             if delta_column == 0 and (delta_row == -1 or (delta_row == -2 and start_position_row_index == 6)): return True
             elif abs(delta_column) == 1 and delta_row == -1: return True
             else: return False
+
+# building
+def initBoard(board_size, board_cell_size, board_margin_size):
+    return None
+
+# not in use til v2.* (not finished)
+class Board:
+    def __init__(self, rect, cells):
+        self.rect = rect
+        self.cells = cells
+
+# not in use til v2.*
+class Cell:
+    def __init__(self, rect, color, name, selected, piece):
+        self.rect = rect
+        self.color = color
+        self.name = name
+        self.selected = selected
+        self.piece = piece
+
+# not in use til v2.*
+class Piece:
+    def __init__(self, color, name, logo):
+        self.color = color
+        self.name = name
+        self.logo = logo
+
+        

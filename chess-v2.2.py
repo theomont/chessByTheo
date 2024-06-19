@@ -6,9 +6,8 @@
 ### last_update: 18/06/2024 ###
 ###############################
 ### Nota da versão:
-### - adicionando ao launcher
 ### - adicionando menu do jogo
-### - adicionado validação de jogada (movimentos permitido da peça)
+### - adicionando ao launcher
 ###############################
 ###############################
 ### Melhorias a realizar:
