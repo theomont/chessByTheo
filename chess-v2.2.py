@@ -27,6 +27,7 @@
 # python -m pygame.docsu
 #ref1 https://www.youtube.com/watch?v=Ro82dac_J1Y
 #ref2 https://pygame.readthedocs.io/en/latest/rect/rect.html
+#ref2 pygamekey https://www.geeksforgeeks.org/how-to-get-keyboard-input-in-pygame/
 
 import pygame
 import chess_lib as lib
@@ -56,6 +57,7 @@ screen_dimension = board_size, board_size
 pygame.init()
 screen = pygame.display.set_mode(screen_dimension)
 clock = pygame.time.Clock()
+pygame.display.set_caption('Chess by Theo')
 running = True
 dt = 0
 
@@ -124,10 +126,16 @@ while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                print("ESC!")
+
+        ## click
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: # left button
                 for num, cell in enumerate(chess):
                     rect, color, name, selected, piece = cell
+                    ## click on cell
                     if cell[0].collidepoint(event.pos):
                         active_cell = num
                         if chess[num][3] == False: 
@@ -155,7 +163,7 @@ while running:
                             origin_cell = None
                             moving_piece = None
                             print("release", piece[0], piece[1], "back to", name)
-
+        ## close window - window X button
         if event.type == pygame.QUIT:
             running = False
 
