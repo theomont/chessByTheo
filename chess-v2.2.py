@@ -75,6 +75,12 @@ destiny_cell = None
 moving_piece = None
 moving_status = False
 
+menu = True
+menu_font_size = 20
+text_menu = "ESC to Resume | SPACE to New Game | Q to Quit"
+
+
+
 ## initializating board ##
 board = pygame.Rect(0,0,board_size,board_size)
 
@@ -94,7 +100,6 @@ for i in range(0,8):
     ## checking set-up ##
     for cell in chess:
         print(cell[2], cell[4][0], cell[4][1] )
-
 
 while running:
     # fill the screen with a color to wipe away anything from last frame
@@ -123,12 +128,33 @@ while running:
             img_rect = img.get_rect(center = rect.center)
             screen.blit(img, img_rect)
     
+    if menu == True:
+        #print("menu")
+        #print("ESC to RESUME game")
+        #print("SPACE to start a new game")
+        #print("'Q' to quit the game")
+        print(text_menu)
+        screen.fill(sty.night)
+        font = pygame.font.SysFont('arial', menu_font_size)
+        font_img = font.render(text_menu, True, sty.ivory)
+        font_img_rect = font_img.get_rect(center = board.center)
+        screen.blit(font_img,font_img_rect)  
+    
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 print("ESC!")
+                if menu == True: menu = False
+                else: menu = True
+            if event.key == pygame.K_SPACE:
+                print("SPACE!")
+                #call reset board
+            if event.key == pygame.K_q:
+                print("Q!")
+                running = False
+
 
         ## click
         if event.type == pygame.MOUSEBUTTONDOWN:
