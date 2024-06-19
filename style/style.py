@@ -12,6 +12,8 @@ dark_cyan = (55, 147, 146) #379392
 steel_blue = (77, 126, 168) #4D7EA8
 lapis_lazuli = (55, 105, 150) #376996
 
+menu_bg_img = pygame.image.load('./style/menu_bg.png')
+
 ## pieces image logo
 white_pawn_logo = pygame.image.load('./style/white_pawn.png')
 white_rook_logo = pygame.image.load('./style/white_rook.png')

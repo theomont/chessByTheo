@@ -34,7 +34,7 @@ import chess_lib as lib
 import style.style as sty
 
 #### Definitions ####
-window_size = (400, 400)
+#window_size = (440, 440)
 
 # board cell definitions
 board_cell_size = 50
@@ -78,8 +78,6 @@ moving_status = False
 menu = True
 menu_font_size = 20
 text_menu = "ESC to Resume | SPACE to New Game | Q to Quit"
-
-
 
 ## initializating board ##
 board = pygame.Rect(0,0,board_size,board_size)
@@ -129,12 +127,10 @@ while running:
             screen.blit(img, img_rect)
     
     if menu == True:
-        #print("menu")
-        #print("ESC to RESUME game")
-        #print("SPACE to start a new game")
-        #print("'Q' to quit the game")
-        print(text_menu)
-        screen.fill(sty.night)
+        # menu ESC =  Resume | SPACE = Restart | Q = Quit
+        #print(text_menu)
+        #screen.fill(sty.night)
+        screen.blit(sty.menu_bg_img,(0,0))
         font = pygame.font.SysFont('arial', menu_font_size)
         font_img = font.render(text_menu, True, sty.ivory)
         font_img_rect = font_img.get_rect(center = board.center)
