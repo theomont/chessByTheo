@@ -88,12 +88,13 @@ def setInitialPiece(name):
     elif name in black_king: return 'black', 'king', sty.black_king_logo
     else: return empty
 
-## versão pré-pygame (requer update)
-# Verifica se movimento é valido
+# check if maviment is valid
 # True when valid, False when invalid
 def validMoviment(start_position, end_position, piece):
-    piece_color = piece.color
-    piece_type  = piece.name
+    if type(piece) == type(Piece()):
+        piece_color = piece.color
+        piece_type  = piece.name
+    else: piece_color, piece_type,  piece_logo = piece
 
     start_position_row_index = getRowIndex(start_position[0])
     start_position_column_index  = getColumnIndex(start_position[1])
