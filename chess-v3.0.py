@@ -151,6 +151,8 @@ while running:
                 else: menu = True
             if event.key == pygame.K_SPACE:
                 print("SPACE!")
+                if menu == True: menu = False
+                else: menu = True
                 #call reset board
             if event.key == pygame.K_q:
                 print("Q!")

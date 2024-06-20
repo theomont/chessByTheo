@@ -20,7 +20,7 @@ while True:
             exec(file.read())
     elif event == 'Version 2+ - GUI (power by pygame)':
         window.close()
-        with open("chess-v2.1.py") as file:
+        with open("chess-v3.0.py") as file:
             exec(file.read())
     elif event == sg.WIN_CLOSED or event == 'Quit Game': 
         window.close()
