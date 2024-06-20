@@ -1,7 +1,10 @@
+#####
+## lib adapted for version v3.+
+#####
 import pygame
 import style.style as sty
 ## constants
-empty = 'none','empty', None
+empty = 'none', 'empty', None
 scale_piece_img_rate = 0.6
 
 ## methods and functions
@@ -53,6 +56,7 @@ def getRowName(index):
 
     return row
 
+# give the initial piece in the address name
 def setInitialPiece(name):
 
     white_pawn = ["2a","2b","2c","2d","2e","2f","2g","2h"]
@@ -88,7 +92,8 @@ def setInitialPiece(name):
 # Verifica se movimento é valido
 # True when valid, False when invalid
 def validMoviment(start_position, end_position, piece):
-    piece_color, piece_type,  piece_logo = piece
+    piece_color = piece.color
+    piece_type  = piece.name
 
     start_position_row_index = getRowIndex(start_position[0])
     start_position_column_index  = getColumnIndex(start_position[1])
@@ -144,20 +149,32 @@ class Board:
         self.rect = rect
         self.cells = cells
 
-# not in use til v2.*
 class Cell:
-    def __init__(self, rect, color, name, selected, piece):
+    def __init__(self, rect, color, addr, selected, piece):
         self.rect = rect
         self.color = color
-        self.name = name
+        self.addr = addr
         self.selected = selected
         self.piece = piece
 
-# not in use til v2.*
 class Piece:
-    def __init__(self, color, name, logo):
-        self.color = color
-        self.name = name
-        self.logo = logo
+    def __init__(self, *args):
+        # empty obj call like lib.Piece()
+        if len(args) == 0: 
+            self.color, self.name, self.logo = empty
+
+        # build with start board address call like lib.Piece(addr)
+        elif len(args) == 1:
+            self.color, self.name, self.logo = setInitialPiece(args[0])
+        
+        # build with piece color, piece name and piece logo image
+        # call like lib.Piece(color, name, logo)
+        elif len(args) == 3:
+            self.color = args[0]
+            self.name = args[1]
+            self.logo = args[2]
+
+
+
 
         

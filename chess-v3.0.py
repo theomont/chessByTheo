@@ -1,17 +1,19 @@
 ###############################
 ###                         ###
-###    CHESS by Theo v2.1   ###
+###    CHESS by Theo v3.0   ###
 ###                         ###   
 ###############################
 ### last_update: 18/06/2024 ###
 ###############################
 ### Nota da versão:
 ### - encapsular rotinas - criar funções de play_game_p2p, menu, etc
-### - utilizar objetos para cell, piece e talvez board (mudar nome board e chess no fluxo do programa)
+### - utilizando objetos para cell e piece
+### - alterado nome de variavel board e chess no fluxo do programa  
 ###############################
 ###############################
 ### Melhorias a realizar:
-### - fazer O.O.
+### - avaliar fazer O.O. para board
+### - corrigir captura de cliques de jogo na tela de menu
 ### - migrar ou recriar sistema de turnos
 ### - Não parmitir que o jogador mexa a pedra do adversario
 ### - verificar obstrução
@@ -66,7 +68,7 @@ board = []
 posX = 0 #distance from left
 posY = 0 #distance from top
 color = board_cell_black_color
-name = None
+addr = None
 selected = False
 
 piece = None #piece color, piece name, piece logo
@@ -88,16 +90,16 @@ for i in range(0,8):
     else:  color = board_cell_white_color
     for j in range(0,8):
         posY = j*board_cell_size + board_margin_size
-        name = lib.getRowName(7-j)+lib.getColumnName(i)
-        piece = lib.setInitialPiece(name)
-        cell =  lib.Cell(pygame.Rect(posX,posY,board_cell_size,board_cell_size), color, name, selected, piece)
+        addr = lib.getRowName(7-j)+lib.getColumnName(i)
+        piece = lib.Piece(addr)
+        cell =  lib.Cell(pygame.Rect(posX,posY,board_cell_size,board_cell_size), color, addr, selected, piece)
         board.append(cell)
         if color == board_cell_white_color: color = board_cell_black_color
         else:  color = board_cell_white_color
     
     ## checking set-up ##
     for cell in board:
-        print(cell.name, cell.piece[0], cell.piece[1] )
+        print(cell.addr, cell.piece.color, cell.piece.name )
 
 while running:
     # fill the screen with a color to wipe away anything from last frame
@@ -105,22 +107,25 @@ while running:
 
     ## drawing board ##
     pygame.draw.rect(screen, board_color, board_rect)
-
+# color, name, logo
     for cell in board:
+        #print("DEBUG cell: ",type(cell))
         #rect, color, name, selected, piece = cell
         #print("get cell", name, color)
-        if cell.selected == False: 
+        if cell.selected == False and menu == False: 
             pygame.draw.rect(screen, cell.color, cell.rect)
             #rect.center = center
-            if cell.piece[2] != None:
-                img = cell.piece[2]
+            print("DEBUG:",cell.piece.color, cell.piece.name, cell.piece.logo)
+            print("DEBUG piece: ", type(cell.piece), cell.piece)
+            if cell.piece.logo != None:
+                img = cell.piece.logo
                 img.convert()
                 img = pygame.transform.rotozoom(img,0,lib.scale_piece_img_rate)
                 img_rect = img.get_rect(center = cell.rect.center)
                 screen.blit(img, img_rect)
-        else:  
+        elif menu == False:  
             pygame.draw.rect(screen, board_cell_sellected_color, cell.rect)
-            img = cell.piece[2]
+            img = cell.piece.logo
             img.convert()
             img = pygame.transform.rotozoom(img,0,lib.scale_piece_img_rate)
             img_rect = img.get_rect(center = cell.rect.center)
@@ -161,20 +166,20 @@ while running:
                     if cell.rect.collidepoint(event.pos): ##possivel bosta pela mudança pra obj
                         active_cell = num
                         if board[num].selected == False: 
-                            if moving_status == False and board[num].piece != lib.empty:   
+                            if moving_status == False and board[num].piece != lib.Piece():   
                                 board[num].selected = True
                                 moving_status = True
                                 origin_cell = num
-                                origin_cell_name = board[num].name
+                                origin_cell_name = board[num].addr
                                 moving_piece = cell.piece
-                                print("grabbed", cell.piece[0], cell.piece[1], "from", cell.name)
+                                print("grabbed", cell.piece.color, cell.piece.name, "from", cell.addr)
                             elif moving_status == True: 
-                                if lib.validMoviment(origin_cell_name, board[num].name, moving_piece):
+                                if lib.validMoviment(origin_cell_name, board[num].addr, moving_piece):
                                     #print("valid")    
                                     board[origin_cell].selected = False
-                                    board[origin_cell].piece = lib.empty
+                                    board[origin_cell].piece = lib.Piece()
                                     board[num].piece = moving_piece
-                                    print("placed", moving_piece[0], moving_piece[1], "on", cell.name)
+                                    print("placed", moving_piece.color, moving_piece.name, "on", cell.addr)
                                     moving_status = False
                                     origin_cell = None
                                     moving_piece = None
@@ -184,7 +189,7 @@ while running:
                             moving_status = False
                             origin_cell = None
                             moving_piece = None
-                            print("release", cell.piece[0], cell.piece[1], "back to", cell.name)
+                            print("release", cell.piece.color, cell.piece.name, "back to", cell.addr)
         ## close window - window X button
         if event.type == pygame.QUIT:
             running = False
