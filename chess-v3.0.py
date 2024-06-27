@@ -6,21 +6,27 @@
 ### last_update: 18/06/2024 ###
 ###############################
 ### Nota da versão:
-### - encapsular rotinas - criar funções de play_game_p2p, menu, etc
 ### - utilizando objetos para cell e piece
-### - alterado nome de variavel board e chess no fluxo do programa  
+### - alterado nome de variavel board e chess no fluxo do programa
+### - criado em chess_lib função validPlay verificando quando peça adversaria e incluindo movimento peculiar do peão  
+### - adicionado sistema de turnos (incluindo não permitir matar a propria peça ou mover peça adversaria)
+### - corrigido bug de movimentação do rei
+### - adicionado validação de se o caminho está livre (freePath em chess lib)
 ###############################
 ###############################
 ### Melhorias a realizar:
+### - adicionar jogada especial Roque
+### - encapsular rotinas - criar funções de play_game_p2p, menu, etc
 ### - avaliar fazer O.O. para board
 ### - corrigir captura de cliques de jogo na tela de menu
 ### - migrar ou recriar sistema de turnos
-### - Não parmitir que o jogador mexa a pedra do adversario
+### - Não permitir que o jogador mexa a pedra do adversario
 ### - verificar obstrução
-### - não permitir que peça mate peça aliada
 ### - abandonar pysimpleGUI e usar Tkinter
 ### - recriar menu
 ### - recriar morte do rei
+### - adicionar sistema de peça matar peça
+### - adicionar propriedade pawn substituir peça
 ### - adicionar timer
 ###############################
 
@@ -71,7 +77,10 @@ color = board_cell_black_color
 addr = None
 selected = False
 
+turn = "white"
+
 piece = None #piece color, piece name, piece logo
+cell_empty = lib.Piece() #object piece with empty values - means cell empty 
 origin_cell = None
 destiny_cell = None
 moving_piece = None
@@ -82,6 +91,7 @@ menu_font_size = 20
 text_menu = "ESC to Resume | SPACE to New Game | Q to Quit"
 
 ## initializating board ##
+board_address_dict = {}
 board_rect = pygame.Rect(0,0,board_size,board_size)
 
 for i in range(0,8):
@@ -97,10 +107,14 @@ for i in range(0,8):
         if color == board_cell_white_color: color = board_cell_black_color
         else:  color = board_cell_white_color
     
-    ## checking set-up ##
-    for cell in board:
-        print(cell.addr, cell.piece.color, cell.piece.name )
+## checking set-up ##
+for board_index, cell in enumerate(board):
+    #print(cell.addr, cell.piece.color, cell.piece.name)
+    print(cell.addr, board_index)
+    
+    board_address_dict[cell.addr] = board_index
 
+print("White's Turn")
 while running:
     # fill the screen with a color to wipe away anything from last frame
     #screen.fill("white")
@@ -112,24 +126,26 @@ while running:
         #print("DEBUG cell: ",type(cell))
         #rect, color, name, selected, piece = cell
         #print("get cell", name, color)
-        if cell.selected == False and menu == False: 
-            pygame.draw.rect(screen, cell.color, cell.rect)
-            #rect.center = center
-            print("DEBUG:",cell.piece.color, cell.piece.name, cell.piece.logo)
-            print("DEBUG piece: ", type(cell.piece), cell.piece)
-            if cell.piece.logo != None:
+        if menu == False:    
+            #print("DEBUG: ", cell.selected)
+            if cell.selected == False: 
+                pygame.draw.rect(screen, cell.color, cell.rect)
+                #rect.center = center
+                #print("DEBUG:",cell.piece.color, cell.piece.name, cell.piece.logo)
+                #print("DEBUG piece: ", type(cell.piece), cell.piece)
+                if cell.piece.logo != None:
+                    img = cell.piece.logo
+                    img.convert()
+                    img = pygame.transform.rotozoom(img,0,lib.scale_piece_img_rate)
+                    img_rect = img.get_rect(center = cell.rect.center)
+                    screen.blit(img, img_rect)
+            elif cell.selected == True:  
+                pygame.draw.rect(screen, board_cell_sellected_color, cell.rect)
                 img = cell.piece.logo
                 img.convert()
                 img = pygame.transform.rotozoom(img,0,lib.scale_piece_img_rate)
                 img_rect = img.get_rect(center = cell.rect.center)
                 screen.blit(img, img_rect)
-        elif menu == False:  
-            pygame.draw.rect(screen, board_cell_sellected_color, cell.rect)
-            img = cell.piece.logo
-            img.convert()
-            img = pygame.transform.rotozoom(img,0,lib.scale_piece_img_rate)
-            img_rect = img.get_rect(center = cell.rect.center)
-            screen.blit(img, img_rect)
     
     if menu == True:
         # menu ESC =  Resume | SPACE = Restart | Q = Quit
@@ -142,8 +158,10 @@ while running:
         screen.blit(font_img,font_img_rect)  
     
     # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
+    
     for event in pygame.event.get():
+        
+        # press keys on menu
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 print("ESC!")
@@ -168,7 +186,9 @@ while running:
                     if cell.rect.collidepoint(event.pos): ##possivel bosta pela mudança pra obj
                         active_cell = num
                         if board[num].selected == False: 
-                            if moving_status == False and board[num].piece != lib.Piece():   
+                            #print("L1")
+                            if moving_status == False and board[num].piece.name != cell_empty.name and board[num].piece.color == turn:
+                                #print("L1.1")   
                                 board[num].selected = True
                                 moving_status = True
                                 origin_cell = num
@@ -176,23 +196,37 @@ while running:
                                 moving_piece = cell.piece
                                 print("grabbed", cell.piece.color, cell.piece.name, "from", cell.addr)
                             elif moving_status == True: 
-                                if lib.validMoviment(origin_cell_name, board[num].addr, moving_piece):
+                                print("L1.2")
+                                if lib.validPlay(origin_cell_name, board[num].addr, moving_piece, board[num].piece, board, board_address_dict):
+                                    print("L1.2.1")
                                     #print("valid")    
                                     board[origin_cell].selected = False
-                                    board[origin_cell].piece = lib.Piece()
+                                    board[origin_cell].piece = cell_empty #lib.Piece()
                                     board[num].piece = moving_piece
                                     print("placed", moving_piece.color, moving_piece.name, "on", cell.addr)
                                     moving_status = False
                                     origin_cell = None
                                     moving_piece = None
-                                else: print("invalid moviment")      
+                                    if turn == "white":
+                                        turn = "black" 
+                                        print("Black's Turn")
+                                    else: 
+                                        turn = "white"
+                                        print("White's Turn")
+                                else: 
+                                    print("L1.2.2")
+                                    print("invalid moviment")
+
                         elif board[num].selected == True: 
+                            print("L2")
                             board[num].selected = False
                             moving_status = False
                             origin_cell = None
                             moving_piece = None
                             print("release", cell.piece.color, cell.piece.name, "back to", cell.addr)
+        
         ## close window - window X button
+        # pygame.QUIT event means the user clicked X to close your window
         if event.type == pygame.QUIT:
             running = False
 

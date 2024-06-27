@@ -106,7 +106,10 @@ def validMoviment(start_position, end_position, piece):
     delta_column = end_position_column_index - start_position_column_index
 
     if piece_type == "king":
-        if (delta_row in range(-1,1)) and (delta_column in range(-1,1)): return True
+        print(delta_row, delta_column)
+        if (delta_row in range(-1,2)) and (delta_column in range(-1,2)): 
+            print("valid movimente returning True")
+            return True
         else: return False
 
     elif piece_type == "queen":
@@ -131,14 +134,222 @@ def validMoviment(start_position, end_position, piece):
 
     elif piece_type == "pawn":
         if piece_color == "white":
+            ## moviment case
             if delta_column == 0 and (delta_row == 1 or (delta_row == 2 and start_position_row_index == 1)): return True
+            ## killinig case
             elif abs(delta_column) == 1 and delta_row == 1: return True
             else: return False
         
         if piece_color == "black":
+            ## moviment case
             if delta_column == 0 and (delta_row == -1 or (delta_row == -2 and start_position_row_index == 6)): return True
+            ## killinig case
             elif abs(delta_column) == 1 and delta_row == -1: return True
             else: return False
+
+def pathFree(start_position, end_position, piece_moving, board, board_address_dict):
+    start_position_row_index = getRowIndex(start_position[0])
+    start_position_column_index  = getColumnIndex(start_position[1])
+
+    end_position_row_index  = getRowIndex(end_position[0])
+    end_position_column_index  = getColumnIndex(end_position[1])
+
+    delta_row = end_position_row_index - start_position_row_index
+    delta_column = end_position_column_index - start_position_column_index
+    
+    if piece_moving.name == "knight" or piece_moving.name == "pawn" or piece_moving.name == "king":
+        return True
+    else:
+        if delta_row == 0:
+            # move to right
+            print("delta_row:",delta_row)
+            print("delta_column:",delta_column)
+            if delta_column > 0:
+                cell_name = start_position
+                position_column_index = start_position_column_index + 1
+                cell_name = cell_name[0] + getColumnName(position_column_index)
+                for i in range(0,delta_column-1):
+                    print(i)
+                    print(cell_name)
+                    print(board[board_address_dict[cell_name]].piece.name)
+                    print(empty[1])
+                    if board[board_address_dict[cell_name]].piece.name != empty[1]:
+                        return False
+                    position_column_index = position_column_index + 1
+                    cell_name = cell_name[0] + getColumnName(position_column_index)
+                return True
+            # move to left
+            elif delta_column < 0:
+                cell_name = start_position
+                position_column_index = start_position_column_index - 1
+                cell_name = cell_name[0] + getColumnName(position_column_index)
+                for i in range(delta_column,-1):
+                    print(i)
+                    print(cell_name)
+                    print(board[board_address_dict[cell_name]].piece.name)
+                    print(empty[1])
+                    if board[board_address_dict[cell_name]].piece.name != empty[1]:
+                        return False
+                    position_column_index = position_column_index - 1
+                    cell_name = cell_name[0] + getColumnName(position_column_index)
+                return True
+        elif delta_column == 0:
+            # move up
+            print("delta_row:",delta_row)
+            print("delta_column:",delta_column)
+            if delta_row > 0:
+                cell_name = start_position
+                position_row_index = start_position_row_index + 1
+                cell_name = getRowName(position_row_index) + cell_name[1]
+                for i in range(0,delta_row-1):
+                    print(i)
+                    print(cell_name)
+                    print(board[board_address_dict[cell_name]].piece.name)
+                    print(empty[1])
+                    if board[board_address_dict[cell_name]].piece.name != empty[1]:
+                        return False
+                    position_row_index = position_row_index + 1
+                    cell_name = getRowName(position_row_index) + cell_name[1]
+                return True
+            # move to down
+            elif delta_row < 0:
+                cell_name = start_position
+                position_row_index = start_position_row_index - 1
+                cell_name = getRowName(position_row_index) + cell_name[1]
+                for i in range(delta_row,-1):
+                    print(i)
+                    print(cell_name)
+                    print(board[board_address_dict[cell_name]].piece.name)
+                    print(empty[1])
+                    if board[board_address_dict[cell_name]].piece.name != empty[1]:
+                        return False
+                    position_row_index = position_row_index - 1
+                    cell_name = getRowName(position_row_index) + cell_name[1]
+                return True
+        #diagonal
+        else:
+            # move up
+            if delta_row > 0:
+                print("delta_row:",delta_row)
+                print("delta_column:",delta_column)
+                # move up and right
+                if delta_column > 0:
+                    cell_name = start_position
+                    position_row_index = start_position_row_index + 1
+                    position_column_index = start_position_column_index + 1
+                    cell_name = getRowName(position_row_index) + getColumnName(position_column_index)
+                    for i in range(0,delta_column-1):
+                        print(i)
+                        print(cell_name)
+                        print(board[board_address_dict[cell_name]].piece.name)
+                        print(empty[1])
+                        if board[board_address_dict[cell_name]].piece.name != empty[1]:
+                            return False
+                        position_row_index = start_position_row_index + 1
+                        position_column_index = start_position_column_index + 1
+                        cell_name = getRowName(position_row_index) + getColumnName(position_column_index)
+                    return True
+                # move up and left
+                elif delta_column < 0:
+                    cell_name = start_position
+                    position_row_index = start_position_row_index + 1
+                    position_column_index = start_position_column_index - 1
+                    cell_name = getRowName(position_row_index) + getColumnName(position_column_index)
+                    for i in range(delta_column,-1):
+                        print(i)
+                        print(cell_name)
+                        print(board[board_address_dict[cell_name]].piece.name)
+                        print(empty[1])
+                        if board[board_address_dict[cell_name]].piece.name != empty[1]:
+                            return False
+                        position_row_index = start_position_row_index + 1
+                        position_column_index = start_position_column_index - 1
+                        cell_name = getRowName(position_row_index) + getColumnName(position_column_index)
+                    return True
+            # move down
+            elif delta_row < 0 :
+                print("delta_row:",delta_row)
+                print("delta_column:",delta_column)
+                # move down and right
+                if delta_column > 0:
+                    cell_name = start_position
+                    position_row_index = start_position_row_index - 1
+                    position_column_index = start_position_column_index + 1
+                    cell_name = getRowName(position_row_index) + getColumnName(position_column_index)
+                    for i in range(0,delta_column-1):
+                        print(i)
+                        print(cell_name)
+                        print(board[board_address_dict[cell_name]].piece.name)
+                        print(empty[1])
+                        if board[board_address_dict[cell_name]].piece.name != empty[1]:
+                            return False
+                        position_row_index = start_position_row_index - 1
+                        position_column_index = start_position_column_index + 1
+                        cell_name = getRowName(position_row_index) + getColumnName(position_column_index)
+                    return True
+                # move down and left
+                elif delta_column < 0:
+                    cell_name = start_position
+                    position_row_index = start_position_row_index - 1
+                    position_column_index = start_position_column_index - 1
+                    cell_name = getRowName(position_row_index) + getColumnName(position_column_index)
+                    for i in range(delta_column,-1):
+                        print(i)
+                        print(cell_name)
+                        print(board[board_address_dict[cell_name]].piece.name)
+                        print(empty[1])
+                        if board[board_address_dict[cell_name]].piece.name != empty[1]:
+                            return False
+                        position_row_index = start_position_row_index - 1
+                        position_column_index = start_position_column_index - 1
+                        cell_name = getRowName(position_row_index) + getColumnName(position_column_index)
+                    return True
+
+
+def validPlay(start_position, end_position, piece_moving, piece_on_destiny, board, board_address_dict):
+    start_position_row_index = getRowIndex(start_position[0])
+    start_position_column_index  = getColumnIndex(start_position[1])
+
+    end_position_row_index  = getRowIndex(end_position[0])
+    end_position_column_index  = getColumnIndex(end_position[1])
+
+    delta_row = end_position_row_index - start_position_row_index
+    delta_column = end_position_column_index - start_position_column_index
+    
+    if validMoviment(start_position, end_position, piece_moving):
+        if piece_on_destiny.name == empty[1]:   
+            # if moving is pawn
+            if piece_moving.name == "pawn":
+                # pawn walk position in front him
+                if delta_column == 0:
+                    return True
+                # pawn walk position in diogonal
+                elif abs(delta_column) == 1:
+                    return False
+            else:
+                if pathFree(start_position, end_position, piece_moving, board, board_address_dict):
+                    print("validMoviment returning True")
+                    return True
+        elif piece_on_destiny.color != piece_moving.color:
+            # if moving is pawn
+            if piece_moving.name == "pawn":
+                # pawn walk position in front him
+                if delta_column == 0:
+                    return False
+                # pawn walk position in diogonal
+                elif abs(delta_column) == 1:
+                    return True
+            else:
+                if pathFree(start_position, end_position, piece_moving, board, board_address_dict):
+                    print("validMoviment returning True")
+                    return True
+        else:
+            return False
+        
+    else: return False
+
+    # if destiny king, True (end game)
+
 
 # building
 def initBoard(board_size, board_cell_size, board_margin_size):
