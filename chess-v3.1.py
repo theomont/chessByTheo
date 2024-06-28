@@ -138,7 +138,9 @@ while running:
                 else: menu = True
             if event.key == pygame.K_SPACE:
                 print("SPACE!")
-                if menu == True: menu = False
+                if menu == True: 
+                    [board_address_dict, board_rect, board] = lib.initBoard(board_cell_white_color, board_cell_black_color, board_cell_size, board_margin_size)
+                    menu = False
                 else: menu = True
                 #call reset board
             if event.key == pygame.K_q:
