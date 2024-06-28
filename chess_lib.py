@@ -483,7 +483,14 @@ def drawMenu(screen, board_rect, menu_bg_img, menu_font_type, menu_font_size, me
     font_img_rect = font_img.get_rect(center = board_rect.center)
     screen.blit(font_img,font_img_rect)
 
-def makeaPlay(clicked_cell_index, origin_cell_index, board, board_address_dict, moving_piece, cell_empty, moving_status,  castlingStatus, turn):
+def drawCheckMate(screen, board_rect, menu_bg_img, menu_font_type, menu_font_size, menu_font_color, text_menu):
+    #screen.blit(menu_bg_img,(0,0))
+    font = pygame.font.SysFont(menu_font_type, menu_font_size)
+    font_img = font.render(text_menu, True, menu_font_color)
+    font_img_rect = font_img.get_rect(center = board_rect.center)
+    screen.blit(font_img,font_img_rect)
+
+def makeaPlay(clicked_cell_index, origin_cell_index, board, board_address_dict, moving_piece, cell_empty, moving_status,  castlingStatus, turn, check_mate):
     ## click on cell
     cell = board[clicked_cell_index]
 
@@ -516,6 +523,9 @@ def makeaPlay(clicked_cell_index, origin_cell_index, board, board_address_dict, 
                 board[origin_cell_index].selected = False
                 board[origin_cell_index].piece = cell_empty #lib.Piece()
                 
+                if board[clicked_cell_index].piece.name == "king":
+                    check_mate = True
+
                 ## promote pawn
                 if moving_piece.name == "pawn":
                     if moving_piece.color == "white" and board[clicked_cell_index].addr[0] == '8':
@@ -548,7 +558,7 @@ def makeaPlay(clicked_cell_index, origin_cell_index, board, board_address_dict, 
         moving_piece = None
         print("release", cell.piece.color, cell.piece.name, "back to", cell.addr)
 
-    return clicked_cell_index, origin_cell_index, board, board_address_dict, moving_piece, cell_empty, moving_status,  castlingStatus, turn
+    return clicked_cell_index, origin_cell_index, board, board_address_dict, moving_piece, cell_empty, moving_status,  castlingStatus, turn, check_mate
 
 
 

@@ -35,7 +35,7 @@ import style.style as sty
 #### Definitions ####
 #window_size = (440, 440)
 
-game_size_aspect_ratio = 2.0 ## to default keep 1 (for monitor w/ 1080px height res. max recomended is 2.2, min 0.9)
+game_size_aspect_ratio = 2 ## to default keep 1 (for monitor w/ 1080px height res. max recomended is 2.2, min 0.9)
 
 # board cell definitions
 board_cell_size = 50*game_size_aspect_ratio # using initBoard default 50 (50px)
@@ -57,9 +57,6 @@ screen_dimension = board_size, board_size
 
 ### TESTE DE CORES ###
 template_number = 3
-print(sty.template)
-print(sty.template[template_number])
-print(sty.template[template_number][0])
 board_cell_white_color = sty.template[template_number][0]
 board_cell_black_color = sty.template[template_number][1]
 board_color = sty.template[template_number][2]
@@ -85,6 +82,7 @@ addr = None
 selected = False
 
 turn = "white"
+check_mate = False
 
 # castling control variable
 rook_1a_first_moviment = True
@@ -112,7 +110,7 @@ moving_piece = None
 moving_status = False
 
 menu = True
-menu_font_size = 20
+menu_font_size = 20*game_size_aspect_ratio
 menu_font_type = 'arial'
 menu_font_color = sty.ivory
 #menu_bg_img = sty.menu_bg_img_ratio_1
@@ -128,10 +126,13 @@ while running:
     if menu == False: 
     ## drawing board ##
         lib.drawBoard(screen, board_color, board_rect, board_cell_sellected_color, board)
+        if check_mate == True:
+            lib.drawCheckMate(screen, board_rect, menu_bg_img, menu_font_type, menu_font_size, sty.night, check_mate_text)
 
     ## drawing menu ##
     if menu == True:
         lib.drawMenu(screen, board_rect, menu_bg_img, menu_font_type, menu_font_size, menu_font_color, text_menu)
+
     
     # poll for events
     
@@ -148,6 +149,7 @@ while running:
                 if menu == True: 
                     [board_address_dict, board_rect, board] = lib.initBoard(board_cell_white_color, board_cell_black_color, board_cell_size, board_margin_size)
                     turn = "white"
+                    check_mate = False
                     menu = False
                 else: menu = True
                 #call reset board
@@ -164,8 +166,13 @@ while running:
                     if menu == False and cell.rect.collidepoint(event.pos):
                         # make a play
                         clicked_cell_index = index # active_cell is a number, it is the index for adressed the cell in the board
-                        r = lib.makeaPlay(clicked_cell_index, origin_cell_index, board, board_address_dict, moving_piece, cell_empty, moving_status,  castlingStatus, turn)
-                        clicked_cell_index, origin_cell_index, board, board_address_dict, moving_piece, cell_empty, moving_status,  castlingStatus, turn = r
+                        r = lib.makeaPlay(clicked_cell_index, origin_cell_index, board, board_address_dict, moving_piece, cell_empty, moving_status,  castlingStatus, turn, check_mate)
+                        clicked_cell_index, origin_cell_index, board, board_address_dict, moving_piece, cell_empty, moving_status,  castlingStatus, turn, check_mate = r
+                        if check_mate == True and turn != "end":
+                            check_mate_text = "The "+turn+" king is dead. Check Mate!"
+                            print("The",turn,"king is dead. Check Mate!")
+                            turn = "end"
+
 
         ## close window - window X button
         # pygame.QUIT event means the user clicked X to close your window
