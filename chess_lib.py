@@ -223,10 +223,13 @@ def pathFree(start_position, end_position, piece_moving, board, board_address_di
                 position_row_index = start_position_row_index + 1
                 cell_name = getRowName(position_row_index) + cell_name[1]
                 for i in range(0,delta_row-1):
-                    #print(i)
-                    #print(cell_name)
+                    print(i)
+                    print(cell_name)
                     #print(board[board_address_dict[cell_name]].piece.name)
-                    #print(empty[1])
+                    print(empty[1])
+                    print(type(cell_name))
+                    print(type(board_address_dict['2a']))
+                    print(type(board[board_address_dict[cell_name]]))
                     if board[board_address_dict[cell_name]].piece.name != empty[1]:
                         return False
                     position_row_index = position_row_index + 1
@@ -238,10 +241,13 @@ def pathFree(start_position, end_position, piece_moving, board, board_address_di
                 position_row_index = start_position_row_index - 1
                 cell_name = getRowName(position_row_index) + cell_name[1]
                 for i in range(delta_row,-1):
-                    #print(i)
-                    #print(cell_name)
-                    #print(board[board_address_dict[cell_name]].piece.name)
-                    #print(empty[1])
+                    print(i)
+                    print(cell_name)
+                    print(board[board_address_dict[cell_name]].piece.name)
+                    print(empty[1])
+                    print(type(cell_name))
+                    print(type(board_address_dict[cell_name]))
+                    print(type(board[board_address_dict[cell_name]]))
                     if board[board_address_dict[cell_name]].piece.name != empty[1]:
                         return False
                     position_row_index = position_row_index - 1
@@ -373,15 +379,68 @@ def validPlay(start_position, end_position, piece_moving, piece_on_destiny, boar
 
 
 # building
-def initBoard(board_size, board_cell_size, board_margin_size):
-    return None
+#def initBoard(board_size, board_cell_size, board_margin_size):
+#    return None
 
-# not in use til v2.* (not finished)
-class Board:
-    def __init__(self, rect, cells):
-        self.rect = rect
-        self.cells = cells
+############
+def initBoard(board_cell_white_color, board_cell_black_color, board_cell_size, board_margin_size):
+    board = []
+    posX = 0 #distance from left
+    posY = 0 #distance from top
+    color = board_cell_black_color
+    addr = None
+    selected = False
 
+    board_size = 8*board_cell_size + 2*board_margin_size
+
+    board_address_dict = {}
+    board_rect = pygame.Rect(0,0,board_size,board_size)
+
+    for i in range(0,8):
+        posX = i*board_cell_size + board_margin_size
+        if color == board_cell_white_color: color = board_cell_black_color
+        else:  color = board_cell_white_color
+        for j in range(0,8):
+            posY = j*board_cell_size + board_margin_size
+            addr = getRowName(7-j)+getColumnName(i)
+            piece = Piece(addr)
+            cell =  Cell(pygame.Rect(posX,posY,board_cell_size,board_cell_size), color, addr, selected, piece)
+            board.append(cell)
+            if color == board_cell_white_color: color = board_cell_black_color
+            else:  color = board_cell_white_color
+        
+    ## checking set-up ##
+    for board_index, cell in enumerate(board):
+        #print(cell.addr, cell.piece.color, cell.piece.name)
+        print(cell.addr, board_index)
+        
+        board_address_dict[cell.addr] = board_index # ex.: {"1a": 1}
+
+    return [board_address_dict, board_rect, board]
+
+def drawBoard(screen, board_color, board_rect, board_cell_sellected_color, board):
+    pygame.draw.rect(screen, board_color, board_rect)
+    
+    for cell in board:   
+        if cell.selected == False: 
+            pygame.draw.rect(screen, cell.color, cell.rect)
+            if cell.piece.logo != None:
+                img = cell.piece.logo
+                img.convert()
+                img = pygame.transform.rotozoom(img,0,scale_piece_img_rate)
+                img_rect = img.get_rect(center = cell.rect.center)
+                screen.blit(img, img_rect)
+        elif cell.selected == True:  
+            pygame.draw.rect(screen, board_cell_sellected_color, cell.rect)
+            img = cell.piece.logo
+            img.convert()
+            img = pygame.transform.rotozoom(img,0,scale_piece_img_rate)
+            img_rect = img.get_rect(center = cell.rect.center)
+            screen.blit(img, img_rect)
+
+####
+## Classes Def.
+####
 class Cell:
     def __init__(self, rect, color, addr, selected, piece):
         self.rect = rect

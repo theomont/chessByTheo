@@ -51,8 +51,8 @@ white_castling_conditions = [True, True, True]
 black_castling_conditions = [True, True, True]
 castlingStatus = {"white":True, "black":True}
 
-print(castlingStatus)
-
+#print(castlingStatus)
+"""
 castlingStatus = getCastlingStatus(white_castling_conditions, black_castling_conditions)
 if castlingStatus["white"]: print(castlingStatus["white"])
 if castlingStatus["black"]: print(castlingStatus["black"])
@@ -62,6 +62,17 @@ black_castling_conditions[1] = False
 castlingStatus = getCastlingStatus(white_castling_conditions, black_castling_conditions)
 if castlingStatus["white"]: print(castlingStatus["white"])
 if castlingStatus["black"]: print(castlingStatus["black"])
+"""
 
+myDict = {
+    "1a": 1,
+    "2a": 2,
+}
+var = "1a"
+varValue = myDict[var]
 
+print(myDict)
+print(myDict['1a'])
+print(myDict[var])
+print(varValue)
 

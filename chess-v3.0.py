@@ -3,7 +3,7 @@
 ###    CHESS by Theo v3.0   ###
 ###                         ###   
 ###############################
-### last_update: 18/06/2024 ###
+### last_update: 27/06/2024 ###
 ###############################
 ### Nota da versão:
 ### - utilizando objetos para cell e piece

@@ -1,22 +1,18 @@
 ###############################
 ###                         ###
-###    CHESS by Theo v3.0   ###
+###    CHESS by Theo v3.1   ###
 ###                         ###   
 ###############################
-### last_update: 18/06/2024 ###
+### last_update: 28/06/2024 ###
 ###############################
 ### Nota da versão:
-### - utilizando objetos para cell e piece
-### - alterado nome de variavel board e chess no fluxo do programa
-### - criado em chess_lib função validPlay verificando quando peça adversaria e incluindo movimento peculiar do peão  
-### - adicionado sistema de turnos (incluindo não permitir matar a propria peça ou mover peça adversaria)
-### - corrigido bug de movimentação do rei
-### - adicionado validação de se o caminho está livre (freePath em chess lib)
+### - 
 ###############################
 ###############################
 ### Melhorias a realizar:
-### - adicionar jogada especial Roque
-### - encapsular rotinas - criar funções de play_game_p2p, menu, etc
+### - encapsular rotinas - criar funções de play_game_p2p, menu, etc 
+### - criar maquina de estados(state machine)?
+### - adicionar jogada especial Roque (castling)
 ### - avaliar fazer O.O. para board
 ### - corrigir captura de cliques de jogo na tela de menu
 ### - migrar ou recriar sistema de turnos
@@ -45,17 +41,19 @@ import style.style as sty
 #window_size = (440, 440)
 
 # board cell definitions
-board_cell_size = 50
+board_cell_size = 50 # using initBoard
+
 board_cell_dimension = board_cell_size , board_cell_size
-board_cell_white_color = sty.wood_light
-board_cell_black_color = sty.wood_dark
+board_cell_white_color = sty.wood_light # using initBoard
+board_cell_black_color = sty.wood_dark # using initBoard
 board_cell_sellected_color = (0,255,0)
 board_cell_moviment_highlight_color_light = (0,200,0) 
 board_cell_moviment_highlight_color_dark = (0,100,0) 
 
 # board definitions
-board_margin_size = 20
-board_size = 8*board_cell_size + 2*board_margin_size
+board_margin_size = 20 # using initBoard
+
+board_size = 8*board_cell_size + 2*board_margin_size # internal in initBoard
 board_dimension = board_size, board_size
 board_color = sty.wood_board
 
@@ -67,7 +65,7 @@ screen = pygame.display.set_mode(screen_dimension)
 clock = pygame.time.Clock()
 pygame.display.set_caption('Chess by Theo')
 running = True
-dt = 0
+#dt = 0
 
 active_cell = None
 board = []
@@ -95,8 +93,6 @@ castlingStatus = [
     black_king_first_moviment,
     rook_8h_first_moviment,
 ]
-    
-
 
 piece = None #piece color, piece name, piece logo
 cell_empty = lib.Piece() #object piece with empty values - means cell empty 
@@ -110,62 +106,16 @@ menu_font_size = 20
 text_menu = "ESC to Resume | SPACE to New Game | Q to Quit"
 
 ## initializating board ##
-board_address_dict = {}
-board_rect = pygame.Rect(0,0,board_size,board_size)
-
-for i in range(0,8):
-    posX = i*board_cell_size + board_margin_size
-    if color == board_cell_white_color: color = board_cell_black_color
-    else:  color = board_cell_white_color
-    for j in range(0,8):
-        posY = j*board_cell_size + board_margin_size
-        addr = lib.getRowName(7-j)+lib.getColumnName(i)
-        piece = lib.Piece(addr)
-        cell =  lib.Cell(pygame.Rect(posX,posY,board_cell_size,board_cell_size), color, addr, selected, piece)
-        board.append(cell)
-        if color == board_cell_white_color: color = board_cell_black_color
-        else:  color = board_cell_white_color
-    
-## checking set-up ##
-for board_index, cell in enumerate(board):
-    #print(cell.addr, cell.piece.color, cell.piece.name)
-    print(cell.addr, board_index)
-    
-    board_address_dict[cell.addr] = board_index
+[board_address_dict, board_rect, board] = lib.initBoard(board_cell_white_color, board_cell_black_color, board_cell_size, board_margin_size)
 
 print("White's Turn")
 while running:
-    # fill the screen with a color to wipe away anything from last frame
-    #screen.fill("white")
 
+    if menu == False: 
     ## drawing board ##
-    pygame.draw.rect(screen, board_color, board_rect)
-# color, name, logo
-    for cell in board:
-        #print("DEBUG cell: ",type(cell))
-        #rect, color, name, selected, piece = cell
-        #print("get cell", name, color)
-        if menu == False:    
-            #print("DEBUG: ", cell.selected)
-            if cell.selected == False: 
-                pygame.draw.rect(screen, cell.color, cell.rect)
-                #rect.center = center
-                #print("DEBUG:",cell.piece.color, cell.piece.name, cell.piece.logo)
-                #print("DEBUG piece: ", type(cell.piece), cell.piece)
-                if cell.piece.logo != None:
-                    img = cell.piece.logo
-                    img.convert()
-                    img = pygame.transform.rotozoom(img,0,lib.scale_piece_img_rate)
-                    img_rect = img.get_rect(center = cell.rect.center)
-                    screen.blit(img, img_rect)
-            elif cell.selected == True:  
-                pygame.draw.rect(screen, board_cell_sellected_color, cell.rect)
-                img = cell.piece.logo
-                img.convert()
-                img = pygame.transform.rotozoom(img,0,lib.scale_piece_img_rate)
-                img_rect = img.get_rect(center = cell.rect.center)
-                screen.blit(img, img_rect)
-    
+        lib.drawBoard(screen, board_color, board_rect, board_cell_sellected_color, board)
+
+    ## menu ##
     if menu == True:
         # menu ESC =  Resume | SPACE = Restart | Q = Quit
         #print(text_menu)
@@ -215,49 +165,6 @@ while running:
                                 moving_piece = cell.piece
                                 print("grabbed", cell.piece.color, cell.piece.name, "from", cell.addr)
                             elif moving_status == True: 
-                                #print("L1.2")
-                                # if board[origin_cell].piece.name == "king":
-                                #     print("check by castling")
-                                #     start_position_row_index = lib.getRowIndex(origin_cell_name[0])
-                                #     start_position_column_index  = lib.getColumnIndex(origin_cell_name[1])
-                                #     end_position_row_index  = lib.getRowIndex(board[num].addr[0])
-                                #     end_position_column_index  = lib.getColumnIndex(board[num].addr[1])
-                                #     delta_row = end_position_row_index - start_position_row_index
-                                #     delta_column = end_position_column_index - start_position_column_index
-                                #     if abs(delta_column) == 2:
-                                #         if turn == "white" and delta_column > 0:
-                                #             if castlingStatus[1] and castlingStatus[2]:
-                                #                 board[board_address_dict["1f"]] = board[board_address_dict["1h"]]
-                                #                 board[board_address_dict["1g"]] = board[board_address_dict["1e"]]
-            
-                                #         elif turn == "white" and delta_column < 0:
-                                #             if castlingStatus[0] and castlingStatus[1]:
-                                #                 board[board_address_dict["1d"]] = board[board_address_dict["1a"]].piece
-                                #                 board[board_address_dict["1c"]] = board[board_address_dict["1e"]].piece
-
-                                #         elif turn == "black" and delta_column > 0:
-                                #             if castlingStatus[4] and castlingStatus[5]:
-                                #                 board[board_address_dict["8f"]] = board[board_address_dict["8h"]].piece
-                                #                 board[board_address_dict["8g"]] = board[board_address_dict["8e"]].piece
-
-                                #         elif turn == "black" and delta_column < 0:
-                                #             if castlingStatus[3] and castlingStatus[4]:
-                                #                 board[board_address_dict["8d"]] = board[board_address_dict["8a"]].piece
-                                #                 board[board_address_dict["8c"]] = board[board_address_dict["8e"]].piece
-                                        
-                                #         print("placed", moving_piece.color, moving_piece.name, "on", cell.addr)
-                                #         castlingStatus = lib.updateCastlingStatus(moving_piece,  board[origin_cell], castlingStatus)
-                                #         print(castlingStatus)
-                                #         moving_status = False
-                                #         origin_cell = None
-                                #         moving_piece = None
-                                #         if turn == "white":
-                                #             turn = "black" 
-                                #             print("Black's Turn")
-                                #         else: 
-                                #             turn = "white"
-                                #             print("White's Turn") 
-
                                 if lib.validPlay(origin_cell_name, board[num].addr, moving_piece, board[num].piece, board, board_address_dict, castlingStatus):
                                     #print("L1.2.1")
                                     #print("valid")    
