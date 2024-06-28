@@ -8,19 +8,16 @@
 ### Nota da versão:
 ### - rotinas encapsuladas
 ### - adicionado jogada especial Roque (castling)
+### - corrigido captura de cliques de jogo na tela de menu
+### - criado promoção do peao para rainha
 ###############################
 ###############################
 ### Melhorias a realizar:
+### - recriar morte do rei
 ### - criar maquina de estados(state machine)?
-### - corrigir captura de cliques de jogo na tela de menu
-### - migrar ou recriar sistema de turnos
-### - Não permitir que o jogador mexa a pedra do adversario
+### - expandir sistema de promoção do peao para escolha de peça
 ### - verificar obstrução
 ### - abandonar pysimpleGUI e usar Tkinter
-### - recriar menu
-### - recriar morte do rei
-### - adicionar sistema de peça matar peça
-### - adicionar propriedade pawn substituir peça
 ### - adicionar timer
 ###############################
 
@@ -38,24 +35,38 @@ import style.style as sty
 #### Definitions ####
 #window_size = (440, 440)
 
-# board cell definitions
-board_cell_size = 50 # using initBoard
+game_size_aspect_ratio = 2.0 ## to default keep 1 (for monitor w/ 1080px height res. max recomended is 2.2, min 0.9)
 
+# board cell definitions
+board_cell_size = 50*game_size_aspect_ratio # using initBoard default 50 (50px)
 board_cell_dimension = board_cell_size , board_cell_size
 board_cell_white_color = sty.wood_light # using initBoard
 board_cell_black_color = sty.wood_dark # using initBoard
-board_cell_sellected_color = (0,255,0)
+board_cell_sellected_color = sty.wood_select
 board_cell_moviment_highlight_color_light = (0,200,0) 
 board_cell_moviment_highlight_color_dark = (0,100,0) 
 
 # board definitions
-board_margin_size = 20 # using initBoard
+board_margin_size = 20*game_size_aspect_ratio # using initBoard default 20 (20px)
 
 board_size = 8*board_cell_size + 2*board_margin_size # internal in initBoard
 board_dimension = board_size, board_size
 board_color = sty.wood_board
 
 screen_dimension = board_size, board_size
+
+### TESTE DE CORES ###
+template_number = 3
+print(sty.template)
+print(sty.template[template_number])
+print(sty.template[template_number][0])
+board_cell_white_color = sty.template[template_number][0]
+board_cell_black_color = sty.template[template_number][1]
+board_color = sty.template[template_number][2]
+board_cell_sellected_color = sty.template[template_number][3]
+
+
+###############
 
 # pygame setup
 pygame.init()
@@ -104,7 +115,8 @@ menu = True
 menu_font_size = 20
 menu_font_type = 'arial'
 menu_font_color = sty.ivory
-menu_bg_img = sty.menu_bg_img
+#menu_bg_img = sty.menu_bg_img_ratio_1
+menu_bg_img = sty.menu_bg_img_ratio_2
 text_menu = "ESC to Resume | SPACE to New Game | Q to Quit"
 
 ## initializating board ##

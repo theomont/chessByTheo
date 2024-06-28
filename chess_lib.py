@@ -486,10 +486,6 @@ def drawMenu(screen, board_rect, menu_bg_img, menu_font_type, menu_font_size, me
 def makeaPlay(clicked_cell_index, origin_cell_index, board, board_address_dict, moving_piece, cell_empty, moving_status,  castlingStatus, turn):
     ## click on cell
     cell = board[clicked_cell_index]
-    
-    isKing = False
-    canCastling = False
-    isCastling = False
 
     print("DEBUG: makeaPlay L0")
     if board[clicked_cell_index].selected == False: 
