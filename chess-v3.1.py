@@ -6,14 +6,12 @@
 ### last_update: 28/06/2024 ###
 ###############################
 ### Nota da versão:
-### - 
+### - rotinas encapsuladas
+### - adicionado jogada especial Roque (castling)
 ###############################
 ###############################
 ### Melhorias a realizar:
-### - encapsular rotinas - criar funções de play_game_p2p, menu, etc 
 ### - criar maquina de estados(state machine)?
-### - adicionar jogada especial Roque (castling)
-### - avaliar fazer O.O. para board
 ### - corrigir captura de cliques de jogo na tela de menu
 ### - migrar ou recriar sistema de turnos
 ### - Não permitir que o jogador mexa a pedra do adversario
@@ -151,7 +149,7 @@ while running:
             if event.button == 1: # left button
                 for index, cell in enumerate(board):
                     ## click on cell
-                    if cell.rect.collidepoint(event.pos):
+                    if menu == False and cell.rect.collidepoint(event.pos):
                         # make a play
                         clicked_cell_index = index # active_cell is a number, it is the index for adressed the cell in the board
                         r = lib.makeaPlay(clicked_cell_index, origin_cell_index, board, board_address_dict, moving_piece, cell_empty, moving_status,  castlingStatus, turn)

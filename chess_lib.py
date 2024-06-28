@@ -513,11 +513,20 @@ def makeaPlay(clicked_cell_index, origin_cell_index, board, board_address_dict, 
         elif moving_status == True:
             print("DEBUG: makeaPlay L2.2")
             print(board[origin_cell_index].addr, board[origin_cell_index].addr, moving_piece)
+            
             ## move piece to a new cell
             if validPlay(board[origin_cell_index].addr, board[clicked_cell_index].addr, moving_piece, board[clicked_cell_index].piece, board, board_address_dict, castlingStatus):
                 print("DEBUG: makeaPlay L3.1")    
                 board[origin_cell_index].selected = False
                 board[origin_cell_index].piece = cell_empty #lib.Piece()
+                
+                ## promote pawn
+                if moving_piece.name == "pawn":
+                    if moving_piece.color == "white" and board[clicked_cell_index].addr[0] == '8':
+                        moving_piece = Piece(moving_piece.color,'queen',sty.white_queen_logo)
+                    elif moving_piece.color == "black" and board[clicked_cell_index].addr[0] == '1':
+                        moving_piece = Piece(moving_piece.color,'queen',sty.black_queen_logo)
+
                 board[clicked_cell_index].piece = moving_piece
                 print("placed", moving_piece.color, moving_piece.name, "on", cell.addr)
                 castlingStatus = updateCastlingStatus(moving_piece,  board[origin_cell_index], castlingStatus)
