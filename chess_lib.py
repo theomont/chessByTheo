@@ -178,7 +178,7 @@ def pathFree(start_position, end_position, piece_moving, board, board_address_di
     delta_row = end_position_row_index - start_position_row_index
     delta_column = end_position_column_index - start_position_column_index
     
-    if piece_moving.name == "knight" or piece_moving.name == "pawn" or piece_moving.name == "king":
+    if piece_moving.name == "knight" or piece_moving.name == "pawn":
         return True
     else:
         if delta_row == 0:
@@ -355,8 +355,46 @@ def validPlay(start_position, end_position, piece_moving, piece_on_destiny, boar
                     return False
             else:
                 if pathFree(start_position, end_position, piece_moving, board, board_address_dict):
-                    #print("validMoviment returning True")
-                    return True
+                    if piece_moving.name == "king":
+                        if abs(delta_column) == 2:
+                            if piece_moving.color == "white" and delta_column > 0:
+                                if castlingStatus[1] and castlingStatus[2]:
+                                    print("casting white king side")
+                                    #print(board[board_address_dict["1f"]].piece.name, piece_moving.name )
+                                    #board[board_address_dict["1f"]].piece = piece_moving
+                                    print(board[board_address_dict["1f"]].piece.name, board[board_address_dict["1h"]].piece.name )
+                                    board[board_address_dict["1f"]].piece = board[board_address_dict["1h"]].piece
+                                    board[board_address_dict["1h"]].piece = Piece()
+                                    castlingStatus[1], castlingStatus[2] = False, False
+                                    return True
+
+                            elif piece_moving.color == "white" and delta_column < 0:
+                                if castlingStatus[0] and castlingStatus[1]:
+                                    #board[board_address_dict["1d"]].piece = piece_moving
+                                    board[board_address_dict["1d"]].piece = board[board_address_dict["1a"]].piece
+                                    board[board_address_dict["1a"]].piece = Piece()
+                                    castlingStatus[0], castlingStatus[1] = False, False
+                                    return True
+
+                            elif piece_moving.color == "black" and delta_column > 0:
+                                if castlingStatus[4] and castlingStatus[5]:
+                                    #board[board_address_dict["8f"]].piece = piece_moving
+                                    board[board_address_dict["8f"]].piece = board[board_address_dict["8h"]].piece
+                                    board[board_address_dict["8h"]].piece = Piece()
+                                    castlingStatus[4], castlingStatus[5] = False, False
+                                    return True
+
+                            elif piece_moving.color == "black" and delta_column < 0:
+                                if castlingStatus[3] and castlingStatus[4]:
+                                    #board[board_address_dict["8d"]].piece = piece_moving
+                                    board[board_address_dict["8d"]].piece = board[board_address_dict["8a"]].piece
+                                    board[board_address_dict["8a"]].piece = Piece()
+                                    castlingStatus[3], castlingStatus[4] = False, False
+                                    return True
+                            else: return False
+                        else: return True
+                    else: return True
+                else: return False
         elif piece_on_destiny.color != piece_moving.color:
             # if moving is pawn
             if piece_moving.name == "pawn":
@@ -437,6 +475,77 @@ def drawBoard(screen, board_color, board_rect, board_cell_sellected_color, board
             img = pygame.transform.rotozoom(img,0,scale_piece_img_rate)
             img_rect = img.get_rect(center = cell.rect.center)
             screen.blit(img, img_rect)
+
+def drawMenu(screen, board_rect, menu_bg_img, menu_font_type, menu_font_size, menu_font_color, text_menu):
+    screen.blit(menu_bg_img,(0,0))
+    font = pygame.font.SysFont(menu_font_type, menu_font_size)
+    font_img = font.render(text_menu, True, menu_font_color)
+    font_img_rect = font_img.get_rect(center = board_rect.center)
+    screen.blit(font_img,font_img_rect)
+
+def makeaPlay(clicked_cell_index, origin_cell_index, board, board_address_dict, moving_piece, cell_empty, moving_status,  castlingStatus, turn):
+    ## click on cell
+    cell = board[clicked_cell_index]
+    
+    isKing = False
+    canCastling = False
+    isCastling = False
+
+    print("DEBUG: makeaPlay L0")
+    if board[clicked_cell_index].selected == False: 
+        print("DEBUG: makeaPlay L1.1")
+        print(board[clicked_cell_index])
+        print(cell)
+        ## grab piece to move
+        if moving_status == False and board[clicked_cell_index].piece.name != cell_empty.name and board[clicked_cell_index].piece.color == turn:
+            print("DEBUG: makeaPlay L2.1")
+            
+            ## if board[clicked_cell_index].piece.name == "king": isKing = True
+               
+            board[clicked_cell_index].selected = True
+            moving_status = True
+            origin_cell_index = clicked_cell_index
+            #origin_cell_name = board[clicked_cell_index].addr
+            moving_piece = cell.piece
+            
+            
+            print("grabbed", cell.piece.color, cell.piece.name, "from", cell.addr)
+        elif moving_status == True:
+            print("DEBUG: makeaPlay L2.2")
+            print(board[origin_cell_index].addr, board[origin_cell_index].addr, moving_piece)
+            ## move piece to a new cell
+            if validPlay(board[origin_cell_index].addr, board[clicked_cell_index].addr, moving_piece, board[clicked_cell_index].piece, board, board_address_dict, castlingStatus):
+                print("DEBUG: makeaPlay L3.1")    
+                board[origin_cell_index].selected = False
+                board[origin_cell_index].piece = cell_empty #lib.Piece()
+                board[clicked_cell_index].piece = moving_piece
+                print("placed", moving_piece.color, moving_piece.name, "on", cell.addr)
+                castlingStatus = updateCastlingStatus(moving_piece,  board[origin_cell_index], castlingStatus)
+                print(castlingStatus)
+                moving_status = False
+                origin_cell_index = None
+                moving_piece = None
+                if turn == "white":
+                    turn = "black" 
+                    print("Black's Turn")
+                else: 
+                    turn = "white"
+                    print("White's Turn") 
+            else:
+                print("DEBUG: makeaPlay L3.2")  
+                print("invalid moviment")
+    ## release piece back, deselect piece, give up to move that piece now
+    elif board[clicked_cell_index].selected == True: 
+        print("DEBUG: makeaPlay L1.2")
+        board[clicked_cell_index].selected = False
+        moving_status = False
+        origin_cell_index = None
+        moving_piece = None
+        print("release", cell.piece.color, cell.piece.name, "back to", cell.addr)
+
+    return clicked_cell_index, origin_cell_index, board, board_address_dict, moving_piece, cell_empty, moving_status,  castlingStatus, turn
+
+
 
 ####
 ## Classes Def.
