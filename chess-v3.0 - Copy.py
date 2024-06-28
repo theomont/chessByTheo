@@ -6,22 +6,19 @@
 ### last_update: 18/06/2024 ###
 ###############################
 ### Nota da versão:
+### - encapsular rotinas - criar funções de play_game_p2p, menu, etc
 ### - utilizando objetos para cell e piece
 ### - alterado nome de variavel board e chess no fluxo do programa
 ### - criado em chess_lib função validPlay verificando quando peça adversaria e incluindo movimento peculiar do peão  
-### - adicionado sistema de turnos (incluindo não permitir matar a propria peça ou mover peça adversaria)
-### - corrigido bug de movimentação do rei
-### - adicionado validação de se o caminho está livre (freePath em chess lib)
 ###############################
 ###############################
 ### Melhorias a realizar:
-### - adicionar jogada especial Roque
-### - encapsular rotinas - criar funções de play_game_p2p, menu, etc
 ### - avaliar fazer O.O. para board
 ### - corrigir captura de cliques de jogo na tela de menu
 ### - migrar ou recriar sistema de turnos
 ### - Não permitir que o jogador mexa a pedra do adversario
 ### - verificar obstrução
+### - não permitir que peça mate peça aliada
 ### - abandonar pysimpleGUI e usar Tkinter
 ### - recriar menu
 ### - recriar morte do rei
@@ -79,25 +76,6 @@ selected = False
 
 turn = "white"
 
-# castling control variable
-rook_1a_first_moviment = True
-white_king_first_moviment = True
-rook_1h_first_moviment = True
-rook_8a_first_moviment = True
-black_king_first_moviment = True
-rook_8h_first_moviment = True
-
-castlingStatus = [
-    rook_1a_first_moviment,
-    white_king_first_moviment,
-    rook_1h_first_moviment,
-    rook_8a_first_moviment,
-    black_king_first_moviment,
-    rook_8h_first_moviment,
-]
-    
-
-
 piece = None #piece color, piece name, piece logo
 cell_empty = lib.Piece() #object piece with empty values - means cell empty 
 origin_cell = None
@@ -110,7 +88,6 @@ menu_font_size = 20
 text_menu = "ESC to Resume | SPACE to New Game | Q to Quit"
 
 ## initializating board ##
-board_address_dict = {}
 board_rect = pygame.Rect(0,0,board_size,board_size)
 
 for i in range(0,8):
@@ -126,14 +103,10 @@ for i in range(0,8):
         if color == board_cell_white_color: color = board_cell_black_color
         else:  color = board_cell_white_color
     
-## checking set-up ##
-for board_index, cell in enumerate(board):
-    #print(cell.addr, cell.piece.color, cell.piece.name)
-    print(cell.addr, board_index)
-    
-    board_address_dict[cell.addr] = board_index
+    ## checking set-up ##
+    for cell in board:
+        print(cell.addr, cell.piece.color, cell.piece.name )
 
-print("White's Turn")
 while running:
     # fill the screen with a color to wipe away anything from last frame
     #screen.fill("white")
@@ -146,7 +119,7 @@ while running:
         #rect, color, name, selected, piece = cell
         #print("get cell", name, color)
         if menu == False:    
-            #print("DEBUG: ", cell.selected)
+            print("DEBUG: ", cell.selected)
             if cell.selected == False: 
                 pygame.draw.rect(screen, cell.color, cell.rect)
                 #rect.center = center
@@ -206,7 +179,7 @@ while running:
                         active_cell = num
                         if board[num].selected == False: 
                             #print("L1")
-                            if moving_status == False and board[num].piece.name != cell_empty.name and board[num].piece.color == turn:
+                            if moving_status == False and board[num].piece.name != cell_empty.name:
                                 #print("L1.1")   
                                 board[num].selected = True
                                 moving_status = True
@@ -216,72 +189,22 @@ while running:
                                 print("grabbed", cell.piece.color, cell.piece.name, "from", cell.addr)
                             elif moving_status == True: 
                                 #print("L1.2")
-                                # if board[origin_cell].piece.name == "king":
-                                #     print("check by castling")
-                                #     start_position_row_index = lib.getRowIndex(origin_cell_name[0])
-                                #     start_position_column_index  = lib.getColumnIndex(origin_cell_name[1])
-                                #     end_position_row_index  = lib.getRowIndex(board[num].addr[0])
-                                #     end_position_column_index  = lib.getColumnIndex(board[num].addr[1])
-                                #     delta_row = end_position_row_index - start_position_row_index
-                                #     delta_column = end_position_column_index - start_position_column_index
-                                #     if abs(delta_column) == 2:
-                                #         if turn == "white" and delta_column > 0:
-                                #             if castlingStatus[1] and castlingStatus[2]:
-                                #                 board[board_address_dict["1f"]] = board[board_address_dict["1h"]]
-                                #                 board[board_address_dict["1g"]] = board[board_address_dict["1e"]]
-            
-                                #         elif turn == "white" and delta_column < 0:
-                                #             if castlingStatus[0] and castlingStatus[1]:
-                                #                 board[board_address_dict["1d"]] = board[board_address_dict["1a"]].piece
-                                #                 board[board_address_dict["1c"]] = board[board_address_dict["1e"]].piece
-
-                                #         elif turn == "black" and delta_column > 0:
-                                #             if castlingStatus[4] and castlingStatus[5]:
-                                #                 board[board_address_dict["8f"]] = board[board_address_dict["8h"]].piece
-                                #                 board[board_address_dict["8g"]] = board[board_address_dict["8e"]].piece
-
-                                #         elif turn == "black" and delta_column < 0:
-                                #             if castlingStatus[3] and castlingStatus[4]:
-                                #                 board[board_address_dict["8d"]] = board[board_address_dict["8a"]].piece
-                                #                 board[board_address_dict["8c"]] = board[board_address_dict["8e"]].piece
-                                        
-                                #         print("placed", moving_piece.color, moving_piece.name, "on", cell.addr)
-                                #         castlingStatus = lib.updateCastlingStatus(moving_piece,  board[origin_cell], castlingStatus)
-                                #         print(castlingStatus)
-                                #         moving_status = False
-                                #         origin_cell = None
-                                #         moving_piece = None
-                                #         if turn == "white":
-                                #             turn = "black" 
-                                #             print("Black's Turn")
-                                #         else: 
-                                #             turn = "white"
-                                #             print("White's Turn") 
-
-                                if lib.validPlay(origin_cell_name, board[num].addr, moving_piece, board[num].piece, board, board_address_dict, castlingStatus):
+                                if lib.validPlay(origin_cell_name, board[num].addr, moving_piece, board[num].piece):
                                     #print("L1.2.1")
                                     #print("valid")    
                                     board[origin_cell].selected = False
                                     board[origin_cell].piece = cell_empty #lib.Piece()
                                     board[num].piece = moving_piece
                                     print("placed", moving_piece.color, moving_piece.name, "on", cell.addr)
-                                    castlingStatus = lib.updateCastlingStatus(moving_piece,  board[origin_cell], castlingStatus)
-                                    print(castlingStatus)
                                     moving_status = False
                                     origin_cell = None
                                     moving_piece = None
-                                    if turn == "white":
-                                        turn = "black" 
-                                        print("Black's Turn")
-                                    else: 
-                                        turn = "white"
-                                        print("White's Turn") 
                                 else: 
-                                    #print("L1.2.2")
+                                    print("L1.2.2")
                                     print("invalid moviment")
 
                         elif board[num].selected == True: 
-                            #print("L2")
+                            print("L2")
                             board[num].selected = False
                             moving_status = False
                             origin_cell = None
