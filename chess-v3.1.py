@@ -13,10 +13,11 @@
 ###############################
 ###############################
 ### Melhorias a realizar:
-### - recriar morte do rei
+### - estruturar variaveis de controle e criar metodo para iniciar e reinicia-las
+### - verificar se o rei está em check
+### - não permitir colocar seu proprio rei em check
 ### - criar maquina de estados(state machine)?
 ### - expandir sistema de promoção do peao para escolha de peça
-### - verificar obstrução
 ### - abandonar pysimpleGUI e usar Tkinter
 ### - adicionar timer
 ###############################
@@ -55,7 +56,7 @@ board_color = sty.wood_board
 
 screen_dimension = board_size, board_size
 
-### TESTE DE CORES ###
+### templates ###
 template_number = 3
 board_cell_white_color = sty.template[template_number][0]
 board_cell_black_color = sty.template[template_number][1]
@@ -140,6 +141,37 @@ while running:
         
         # press keys
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_0:
+                template_number = 0
+                board_cell_white_color = sty.template[template_number][0]
+                board_cell_black_color = sty.template[template_number][1]
+                board_color = sty.template[template_number][2]
+                board_cell_sellected_color = sty.template[template_number][3]
+
+            if event.key == pygame.K_1:
+                template_number = 1
+                board_cell_white_color = sty.template[template_number][0]
+                board_cell_black_color = sty.template[template_number][1]
+                board_color = sty.template[template_number][2]
+                board_cell_sellected_color = sty.template[template_number][3]
+
+            if event.key == pygame.K_2:
+                template_number = 2
+                board_cell_white_color = sty.template[template_number][0]
+                board_cell_black_color = sty.template[template_number][1]
+                board_color = sty.template[template_number][2]
+                board_cell_sellected_color = sty.template[template_number][3]
+
+            if event.key == pygame.K_3:
+                template_number = 3
+                board_cell_white_color = sty.template[template_number][0]
+                board_cell_black_color = sty.template[template_number][1]
+                board_color = sty.template[template_number][2]
+                board_cell_sellected_color = sty.template[template_number][3]
+
+
+            
+            
             if event.key == pygame.K_ESCAPE:
                 print("ESC!")
                 if menu == True: menu = False
@@ -148,10 +180,10 @@ while running:
                 print("SPACE!")
                 if menu == True: 
                     [board_address_dict, board_rect, board] = lib.initBoard(board_cell_white_color, board_cell_black_color, board_cell_size, board_margin_size)
+                    castlingStatus
                     turn = "white"
                     check_mate = False
                     menu = False
-                else: menu = True
                 #call reset board
             if event.key == pygame.K_q:
                 print("Q!")

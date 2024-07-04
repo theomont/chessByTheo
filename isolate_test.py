@@ -1,3 +1,5 @@
+import copy
+
 class ObjOfMine:
     def __init__(self, name):
         self.name = name
@@ -9,7 +11,48 @@ C = ObjOfMine("C")
 
 #print(A.name,B.name, C.name)
 
-A = B
+L = [3,A,B,C]
+L1 = copy.copy(L)
+L2 = copy.deepcopy(L)
+print(hex(id(L)),L)
+print(hex(id(L1)),L1)
+print(hex(id(L2)),L2)
+
+
+L[0] = 1
+print(hex(id(L)),L)
+print(hex(id(L2)),L2)
+
+## endereço da variavel A
+auxA = A
+auxL = L
+A = 0
+L = copy.deepcopy(0)
+print(hex(id(0)), "Endereço da Variavel 0(&0)")
+print(hex(id(A)), "Endereço da Variavel A(&A)")
+print(hex(id(L)), "Endereço da Variavel L(&L)")
+A = 0
+L = 1
+print(hex(id(A)), "Endereço da Variavel A(&A)")
+print(hex(id(L)), "Endereço da Variavel L(&L)")
+
+
+A = auxA
+print(hex(id(A)), "Endereço do objeto referenciado por A, ou valor da variavel(A)")
+
+print(A, "Objeto apontado por A, conteudo no endereço armazenado em *A")
+#########
+auxL = L
+L = 0
+print(hex(id(L)), "Endereço da Variavel L(&L)")
+
+L = auxL
+print(hex(id(L)), "Endereço do objeto referenciado por L, ou valor da variavel(L)")
+
+print(L, "Objeto apontado por L, conteudo no endereço armazenado em *L")
+
+
+#print("A id:",id(A))
 
 #print("A:",A.name,"B:",B.name)
 #print("A id:",id(A),"B id:",id(B))
@@ -62,7 +105,7 @@ black_castling_conditions[1] = False
 castlingStatus = getCastlingStatus(white_castling_conditions, black_castling_conditions)
 if castlingStatus["white"]: print(castlingStatus["white"])
 if castlingStatus["black"]: print(castlingStatus["black"])
-"""
+
 
 myDict = {
     "1a": 1,
@@ -75,4 +118,4 @@ print(myDict)
 print(myDict['1a'])
 print(myDict[var])
 print(varValue)
-
+"""

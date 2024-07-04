@@ -70,9 +70,18 @@ template.append([ivory, paynes_gray, outer_space, blue_munsell])
 
 
 ########################
+## images ##
 
-menu_bg_img_ratio_1 = pygame.image.load('./style/menu_bg.png')
-menu_bg_img_ratio_2 = pygame.image.load('./style/menu_bg2.png')
+#menu_bg
+helm_440 = pygame.image.load('./style/menu_bg.png')
+helm_880 = pygame.image.load('./style/menu_bg2.png')
+
+menu_bg_img_ratio_1 = helm_440
+menu_bg_img_ratio_2 = helm_880
+
+#board_bg
+wood = pygame.image.load('./style/wood_board.png')
+dark_marble = pygame.image.load('./style/dark_marble.jpg')
 
 ## pieces image logo
 white_pawn_logo = pygame.image.load('./style/white_pawn.png')
